@@ -1,33 +1,50 @@
-# Streamlitライブラリをインポート
 import streamlit as st
+import math
 
-# ページ設定（タブに表示されるタイトル、表示幅）
-st.set_page_config(page_title="タイトル", layout="wide")
+def prime_factorization(n):
+    factors = []
+    
+    # 2で割り切れる間は2で割り続ける
+    while n % 2 == 0:
+        factors.append(2)
+        n = n // 2
+    
+    # 3以上の奇数で割っていく
+    for i in range(3, int(math.sqrt(n)) + 1, 2):
+        while n % i == 0:
+            factors.append(i)
+            n = n // i
+    
+    # 最後に残った数が1より大きければ、それも素因数
+    if n > 1:
+        factors.append(n)
+    
+    return factors
 
-# タイトルを設定
-st.title('ジャグラー')
+st.title('素因数分解プログラム')
 
-# テキスト入力ボックスを作成し、ユーザーからの入力を受け取る
-user_input = st.text_input('あなたの借金額を入力してください')
+number = st.number_input('正の整数を入力してください:', min_value=1, step=1)
 
-# ボタンを作成し、クリックされたらメッセージを表示
-if st.button('借金！！！'):
-    if user_input:  # 名前が入力されているかチェック
-        st.success(f'🌟 あなたの借金は{user_input}円です!ジャグラーで一攫千金目指しましょう!!! 🌟')  # メッセージをハイライト
+if st.button('素因数分解'):
+    if number > 1:
+        factors = prime_factorization(int(number))
+        
+        st.write(f'{int(number)}の素因数分解結果:')
+        
+        # 素因数とその指数を表示
+        factor_counts = {}
+        for factor in factors:
+            if factor in factor_counts:
+                factor_counts[factor] += 1
+            else:
+                factor_counts[factor] = 1
+        
+        result = ' × '.join([f'{factor}^{count}' if count > 1 else str(factor) for factor, count in factor_counts.items()])
+        st.latex(result)
+        
+        # 展開した形も表示
+        expanded = ' × '.join(map(str, factors))
+        st.write('展開形:')
+        st.latex(expanded)
     else:
-        st.error('借金を入力してください。')  # エラーメッセージを表示
-
-# スライダーを作成し、値を選択
-number = st.slider('好きな数字（10進数）を選んでください', 0, 100)
-
-# 補足メッセージ
-st.caption("十字キー（左右）でも調整できます。")
-
-# 選択した数字を表示
-st.write(f'あなたが選んだ数字は「{number}」です。')
-
-# 選択した数値を2進数に変換
-binary_representation = bin(number)[2:]  # 'bin'関数で2進数に変換し、先頭の'0b'を取り除く
-st.info(f'🔢 10進数の「{number}」を2進数で表現すると「{binary_representation}」になります。 🔢')  # 2進数の表示をハイライト
-
-min_
+        st.write('1より大きい整数を入力してください。')
