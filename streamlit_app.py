@@ -1,50 +1,33 @@
 import streamlit as st
 import math
 
-def prime_factorization(n):
-    factors = []
-    
-    # 2で割り切れる間は2で割り続ける
-    while n % 2 == 0:
-        factors.append(2)
-        n = n // 2
-    
-    # 3以上の奇数で割っていく
-    for i in range(3, int(math.sqrt(n)) + 1, 2):
-        while n % i == 0:
-            factors.append(i)
-            n = n // i
-    
-    # 最後に残った数が1より大きければ、それも素因数
-    if n > 1:
-        factors.append(n)
-    
-    return factors
+def is_prime(n):
+    if n < 2:
+        return False
+    for i in range(2, int(math.sqrt(n)) + 1):
+        if n % i == 0:
+            return False
+    return True
 
-st.title('素因数分解プログラム')
+st.title("素数判定プログラム")
 
-number = st.number_input('正の整数を入力してください:', min_value=1, step=1)
+number = st.number_input("正の整数を入力してください:", min_value=1, step=1)
 
-if st.button('素因数分解'):
-    if number > 1:
-        factors = prime_factorization(int(number))
-        
-        st.write(f'{int(number)}の素因数分解結果:')
-        
-        # 素因数とその指数を表示
-        factor_counts = {}
-        for factor in factors:
-            if factor in factor_counts:
-                factor_counts[factor] += 1
-            else:
-                factor_counts[factor] = 1
-        
-        result = ' × '.join([f'{factor}^{count}' if count > 1 else str(factor) for factor, count in factor_counts.items()])
-        st.latex(result)
-        
-        # 展開した形も表示
-        expanded = ' × '.join(map(str, factors))
-        st.write('展開形:')
-        st.latex(expanded)
+if st.button("判定"):
+    if number.is_integer():
+        number = int(number)
+        if is_prime(number):
+            st.success(f"{number} は素数です！")
+        else:
+            st.error(f"{number} は素数ではありません。")
     else:
-        st.write('1より大きい整数を入力してください。')
+        st.warning("整数を入力してください。")
+
+st.write("---")
+st.write("このプログラムは2から入力された数までの素数も表示します。")
+
+if st.button("素数リストを表示"):
+    primes = [num for num in range(2, int(number) + 1) if is_prime(num)]
+    st.write(f"2から{int(number)}までの素数:")
+    st.write(primes)
+
